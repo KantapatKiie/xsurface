@@ -6,7 +6,7 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: white;
   min-height: 100vh;
   padding: 20px;
 }
@@ -21,7 +21,7 @@ body {
 }
 
 header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #667eea 0%, #aeaeae 100%);
   color: white;
   padding: 40px;
   text-align: center;
@@ -53,7 +53,7 @@ main {
 }
 
 .question-section h3 {
-  color: #667eea;
+  color: #000000;
   font-size: 1.8rem;
   margin-bottom: 20px;
   padding-bottom: 10px;
@@ -64,7 +64,7 @@ main {
   background: #f8f9fa;
   border-radius: 8px;
   padding: 20px;
-  border-left: 4px solid #667eea;
+  border: 1px solid #000000;
 }
 
 .code-block h4 {
