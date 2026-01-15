@@ -15,4 +15,3 @@ mongodb_data/
 *.swo
 coverage/
 .turbo/
-PT1_BasicJS_CSS/index.html
