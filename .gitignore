@@ -1,0 +1,17 @@
+node_modules/
+.next/
+dist/
+build/
+*.log
+.env
+.env.local
+.env.production
+.DS_Store
+uploads/*
+!uploads/.gitkeep
+mongodb_data/
+.vscode/
+*.swp
+*.swo
+coverage/
+.turbo/
