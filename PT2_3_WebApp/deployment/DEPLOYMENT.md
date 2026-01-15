@@ -1,11 +1,13 @@
 # Deployment Guide - XSurface Web Application
 
 ## Overview
+
 This document outlines the deployment strategy for the XSurface full-stack web application, including Docker Hub image distribution and deployment to various hosting providers.
 
 ---
 
 ## Architecture
+
 - **Frontend**: Next.js 16.1.2 (React 19)
 - **Backend**: Node.js + Express + TypeScript
 - **Database**: MongoDB
@@ -56,6 +58,7 @@ Visit: https://hub.docker.com/r/kantapatkie/xsurface-frontend
 ## 2. Environment Variables
 
 ### Backend (.env)
+
 ```env
 PORT=5000
 MONGODB_URI=mongodb://mongodb:27017/xsurface
@@ -63,11 +66,13 @@ NODE_ENV=production
 ```
 
 ### Frontend (.env.local)
+
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:6001/api
 ```
 
 ### Production Frontend (.env.production)
+
 ```env
 NEXT_PUBLIC_API_URL=https://your-backend-domain.com/api
 ```
@@ -79,6 +84,7 @@ NEXT_PUBLIC_API_URL=https://your-backend-domain.com/api
 ### Option 1: Docker Compose (VPS/Cloud)
 
 #### 3.1 Prepare Server
+
 ```bash
 # Install Docker and Docker Compose on Ubuntu/Debian
 sudo apt update
@@ -88,18 +94,21 @@ sudo systemctl start docker
 ```
 
 #### 3.2 Clone Repository
+
 ```bash
 git clone https://github.com/KantapatKiie/xsurface.git
 cd xsurface/PT2_3_WebApp
 ```
 
 #### 3.3 Update Environment Variables
+
 ```bash
 # Update frontend/.env.local with production API URL
 echo "NEXT_PUBLIC_API_URL=http://your-server-ip:6001/api" > frontend/.env.local
 ```
 
 #### 3.4 Deploy
+
 ```bash
 # Start all services
 ./start.sh
@@ -109,6 +118,7 @@ docker-compose up -d --build
 ```
 
 #### 3.5 Nginx Reverse Proxy (Optional)
+
 ```nginx
 # /etc/nginx/sites-available/xsurface
 server {
@@ -139,11 +149,13 @@ server {
 ### Option 2: Railway.app
 
 #### 2.1 Create New Project
+
 1. Visit https://railway.app
 2. Create new project
 3. Add MongoDB database from marketplace
 
 #### 2.2 Deploy Backend
+
 ```bash
 # Add Railway remote
 railway login
@@ -160,6 +172,7 @@ railway up
 ```
 
 #### 2.3 Deploy Frontend
+
 ```bash
 cd ../frontend
 railway up
@@ -169,6 +182,7 @@ railway up
 ```
 
 #### 2.4 Automatic Seed
+
 ```bash
 # In Railway backend service, add build command:
 # npm install && npm run build && npx ts-node src/seed.ts
@@ -179,11 +193,13 @@ railway up
 ### Option 3: Render.com
 
 #### 3.1 Create MongoDB Atlas Account
+
 1. Visit https://www.mongodb.com/cloud/atlas
 2. Create free cluster
 3. Get connection string
 
 #### 3.2 Deploy Backend (Web Service)
+
 - Repository: https://github.com/KantapatKiie/xsurface
 - Root Directory: `PT2_3_WebApp/backend`
 - Build Command: `npm install && npm run build`
@@ -196,6 +212,7 @@ railway up
   ```
 
 #### 3.3 Deploy Frontend (Web Service)
+
 - Root Directory: `PT2_3_WebApp/frontend`
 - Build Command: `npm install && npm run build`
 - Start Command: `npm start`
@@ -209,6 +226,7 @@ railway up
 ### Option 4: AWS ECS (Elastic Container Service)
 
 #### 4.1 Push to ECR (Elastic Container Registry)
+
 ```bash
 # Login to ECR
 aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin your-account-id.dkr.ecr.ap-southeast-1.amazonaws.com
@@ -226,12 +244,15 @@ docker push your-account-id.dkr.ecr.ap-southeast-1.amazonaws.com/xsurface-fronte
 ```
 
 #### 4.2 Create ECS Cluster
+
 ```bash
 aws ecs create-cluster --cluster-name xsurface-cluster
 ```
 
 #### 4.3 Create Task Definitions
+
 Create `task-definition-backend.json`:
+
 ```json
 {
   "family": "xsurface-backend",
@@ -255,6 +276,7 @@ Create `task-definition-backend.json`:
 ```
 
 #### 4.4 Deploy Services
+
 ```bash
 aws ecs create-service \
   --cluster xsurface-cluster \
@@ -269,6 +291,7 @@ aws ecs create-service \
 ### Option 5: DigitalOcean App Platform
 
 #### 5.1 Connect Repository
+
 1. Go to https://cloud.digitalocean.com/apps
 2. Click "Create App"
 3. Connect GitHub repository: `KantapatKiie/xsurface`
@@ -276,6 +299,7 @@ aws ecs create-service \
 #### 5.2 Configure Components
 
 **Backend:**
+
 - Source Directory: `PT2_3_WebApp/backend`
 - Dockerfile Path: `PT2_3_WebApp/backend/Dockerfile`
 - HTTP Port: 5000
@@ -287,6 +311,7 @@ aws ecs create-service \
   ```
 
 **Frontend:**
+
 - Source Directory: `PT2_3_WebApp/frontend`
 - Dockerfile Path: `PT2_3_WebApp/frontend/Dockerfile`
 - HTTP Port: 3000
@@ -296,6 +321,7 @@ aws ecs create-service \
   ```
 
 **Database:**
+
 - Add MongoDB from marketplace
 
 ---
@@ -340,6 +366,7 @@ docker run -d \
 ### Docker Compose with Hub Images
 
 Create `docker-compose.hub.yml`:
+
 ```yaml
 services:
   mongodb:
@@ -388,6 +415,7 @@ networks:
 ```
 
 Deploy:
+
 ```bash
 docker-compose -f docker-compose.hub.yml up -d
 ```
@@ -399,6 +427,7 @@ docker-compose -f docker-compose.hub.yml up -d
 ### GitHub Actions Workflow
 
 Create `.github/workflows/deploy.yml`:
+
 ```yaml
 name: Build and Deploy
 
@@ -411,13 +440,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+  
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      
+  
       - name: Build and Push Backend
         uses: docker/build-push-action@v4
         with:
@@ -426,7 +455,7 @@ jobs:
           tags: |
             kantapatkie/xsurface-backend:latest
             kantapatkie/xsurface-backend:${{ github.sha }}
-      
+  
       - name: Build and Push Frontend
         uses: docker/build-push-action@v4
         with:
@@ -442,7 +471,9 @@ jobs:
 ## 6. Health Checks & Monitoring
 
 ### Backend Health Endpoint
+
 Add to `backend/src/index.ts`:
+
 ```typescript
 app.get('/health', (req, res) => {
   res.json({ 
@@ -454,13 +485,16 @@ app.get('/health', (req, res) => {
 ```
 
 ### Docker Health Check
+
 Add to `backend/Dockerfile`:
+
 ```dockerfile
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s \
   CMD node -e "require('http').get('http://localhost:5000/health', (r) => r.statusCode === 200 ? process.exit(0) : process.exit(1))"
 ```
 
 ### Monitoring Tools
+
 - **Uptime Monitoring**: UptimeRobot, Pingdom
 - **Logs**: Datadog, Logtail, CloudWatch
 - **APM**: New Relic, Sentry
@@ -470,12 +504,14 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=40s \
 ## 7. SSL/HTTPS Setup
 
 ### Let's Encrypt with Certbot (Nginx)
+
 ```bash
 sudo apt install certbot python3-certbot-nginx -y
 sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
 ```
 
 ### Cloudflare (Free SSL)
+
 1. Add domain to Cloudflare
 2. Update nameservers
 3. Enable SSL/TLS (Full mode)
@@ -486,6 +522,7 @@ sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
 ## 8. Scaling Strategies
 
 ### Horizontal Scaling
+
 ```bash
 # Scale backend to 3 replicas
 docker-compose up -d --scale backend=3
@@ -499,6 +536,7 @@ upstream backend_servers {
 ```
 
 ### Database Replication
+
 ```yaml
 # MongoDB Replica Set
 services:
@@ -516,12 +554,14 @@ services:
 ## 9. Backup Strategy
 
 ### Database Backup
+
 ```bash
 # Automated daily backup
 0 2 * * * docker exec mongodb mongodump --out /backup/$(date +\%Y\%m\%d) && find /backup -mtime +7 -delete
 ```
 
 ### Restore
+
 ```bash
 docker exec -i mongodb mongorestore /backup/20260115
 ```
@@ -531,6 +571,7 @@ docker exec -i mongodb mongorestore /backup/20260115
 ## 10. Troubleshooting
 
 ### Check Container Logs
+
 ```bash
 docker logs backend -f
 docker logs frontend -f
@@ -540,34 +581,23 @@ docker logs mongodb -f
 ### Common Issues
 
 **Frontend cannot connect to backend:**
+
 - Verify NEXT_PUBLIC_API_URL is correct
 - Check CORS settings in backend
 - Ensure backend is running on correct port
 
 **Database connection failed:**
+
 - Check MONGODB_URI format
 - Verify MongoDB container is running
 - Check network connectivity
 
 **Port conflicts:**
+
 - Use `lsof -ti:6001 | xargs kill -9` to free port
 - Or change port in docker-compose.yml
 
----
-
-## 11. Cost Estimation
-
-| Provider | Monthly Cost | Specs |
-|----------|--------------|-------|
-| Railway | $5-20 | 512MB RAM, shared CPU |
-| Render | $7-25 | 512MB RAM, 0.5 CPU |
-| DigitalOcean | $12-24 | 1GB RAM, 1 vCPU |
-| AWS ECS | $15-40 | Fargate 0.5vCPU, 1GB |
-| VPS (Linode) | $5-10 | 1GB RAM, 1 Core |
-
----
-
-## 12. Production Checklist
+## 11. Production Checklist
 
 - [ ] Environment variables set correctly
 - [ ] Database backups configured
@@ -583,7 +613,9 @@ docker logs mongodb -f
 ---
 
 ## Support
+
 For issues and questions:
+
 - GitHub: https://github.com/KantapatKiie/xsurface/issues
 - Email: kantapat.sangjan@example.com
 
